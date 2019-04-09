@@ -1,0 +1,26 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AKSName": {
+      "value": "aks101cluster123"
+    },
+    "dnsPrefix": {
+      "value": "aks101cluster123-dns"
+    },
+
+    "enableRBAC": {
+      "value": false
+    },
+    "enableHttpApplicationRouting": {
+      "value": false
+    },
+
+    "servicePrincipalClientId": {
+      "value": " "
+    },
+    "servicePrincipalClientSecret": {
+      "value": " "
+    }
+  }
+}
