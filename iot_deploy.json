@@ -1,0 +1,82 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "iotHubName": {
+            "minLength": 3,
+            "type": "String",
+            "metadata": {
+                "description": "Specifies the name of the IoT Hub."
+            }
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "String",
+            "metadata": {
+                "description": "Specifies the location for all resources."
+            }
+        },
+        "skuName": {
+            "defaultValue": "S1",
+            "type": "String",
+            "metadata": {
+                "description": "Specifies the IotHub SKU."
+            }
+        },
+ 
+        "subscriptionId": {
+            "type": "String"
+        },
+        "capacityUnits": {
+            "defaultValue": 1,
+            "minValue": 1,
+            "type": "Int",
+            "metadata": {
+                "description": "Specifies the number of provisioned IoT Hub units. Restricted to 1 unit for the F1 SKU. Can be set up to maximum number allowed for subscription."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Devices/IotHubs",
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "capacity": "[parameters('capacityUnits')]"
+            },
+            "name": "[parameters('iotHubName')]",
+            "apiVersion": "2018-04-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "eventHubEndpoints": {
+                    "events": {
+                        "retentionTimeInDays": 1,
+                        "partitionCount": 4
+                    }
+                },
+                "cloudToDevice": {
+                    "defaultTtlAsIso8601": "PT1H",
+                    "maxDeliveryCount": 10,
+                    "feedback": {
+                        "ttlAsIso8601": "PT1H",
+                        "lockDurationAsIso8601": "PT60S",
+                        "maxDeliveryCount": 10
+                    }
+                },
+                "messagingEndpoints": {
+                    "fileNotifications": {
+                        "ttlAsIso8601": "PT1H",
+                        "lockDurationAsIso8601": "PT1M",
+                        "maxDeliveryCount": 10
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "iotHubKeys": {
+            "type": "Object",
+            "value": "[listKeys(resourceId('Microsoft.Devices/iotHubs', parameters('iotHubName')), '2018-04-01')]"
+        }
+    }
+}
