@@ -23,10 +23,6 @@
                 "description": "Specifies the IotHub SKU."
             }
         },
- 
-        "subscriptionId": {
-            "type": "String"
-        },
         "capacityUnits": {
             "defaultValue": 1,
             "minValue": 1,
@@ -34,19 +30,53 @@
             "metadata": {
                 "description": "Specifies the number of provisioned IoT Hub units. Restricted to 1 unit for the F1 SKU. Can be set up to maximum number allowed for subscription."
             }
+        },
+        "storageAccountName": {
+            "type": "String"
+        },
+        "newOrExisting": {
+            "defaultValue": "existing",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "type": "String"
+        },
+        "storageContainerName": {
+            "type": "String"
+        },
+        "eventhubnamespaceName": {
+            "type": "String"
+        },
+        "eventhubName": {
+            "type": "String"
+        },
+        "SASName": {
+            "type": "String"
+        },
+        "storage_endpoint": {
+            "type": "String"
+        },
+        "eventhub_endpoint": {
+            "type": "String"
         }
     },
-    "variables": {},
+    "variables": {
+        "StorageAccountName": "[parameters('storageAccountName')]",
+        "eventhubnamespaceName": "[parameters('eventhubnamespaceName')]",
+        "eventhubName": "[parameters('eventhubName')]",
+        "authRuleResourceId": "[parameters('SASName')]"
+    },
     "resources": [
         {
             "type": "Microsoft.Devices/IotHubs",
+            "apiVersion": "2018-04-01",
+            "name": "[parameters('iotHubName')]",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "[parameters('skuName')]",
                 "capacity": "[parameters('capacityUnits')]"
             },
-            "name": "[parameters('iotHubName')]",
-            "apiVersion": "2018-04-01",
-            "location": "[parameters('location')]",
             "properties": {
                 "eventHubEndpoints": {
                     "events": {
@@ -69,6 +99,52 @@
                         "lockDurationAsIso8601": "PT1M",
                         "maxDeliveryCount": 10
                     }
+                },
+                "routing": {
+                    "endpoints": {
+                        "serviceBusTopics": [],
+                        "eventHubs": [
+                            {
+                                "connectionstring": "[listkeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventhubnamespaceName'), variables('eventhubName'), variables('authRuleResourceId')),'2017-04-01').primaryConnectionString ]",
+                                "eventhubinstance": "[parameters('eventhubName')]",
+                                "name": "[parameters('eventhub_endpoint')]",
+                                "resourceGroup": "[resourceGroup().Name]"
+                            }
+                        ],
+                        "serviceBusQueues": [],
+                        "storageContainers": [
+                            {
+                                "connectionString": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+                                "containerName": "[parameters('storageContainerName')]",
+                                "fileNameFormat": "{iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm}",
+                                "batchFrequencyInSeconds": 100,
+                                "maxChunkSizeInBytes": 104857600,
+                                "encoding": "avro",
+                                "name": "[parameters('storage_endpoint')]",
+                                "resourceGroup": "[resourceGroup().Name]"
+                            }
+                        ]
+                    },
+                    "routes": [
+                        {
+                            "name": "StorageRoute",
+                            "source": "DeviceMessages",
+                            "condition": "$body.MsgType = 'MSG_HEARTBEAT'",
+                            "endpointNames": [
+                                "[parameters('storage_endpoint')]"
+                            ],
+                            "isEnabled": true
+                        },
+                        {
+                            "name": "eventhubRoute",
+                            "source": "DeviceMessages",
+                            "condition": "$body.MsgType = 'MSG_HEARTBEAT'",
+                            "endpointNames": [
+                                "[parameters('eventhub_endpoint')]"
+                            ],
+                            "isEnabled": true
+                        }
+                    ]
                 }
             }
         }
