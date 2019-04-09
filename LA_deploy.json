@@ -1,0 +1,91 @@
+{
+
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+
+  "contentVersion": "1.0.0.0",
+
+  "parameters": {
+
+    "LogicAppName": {
+
+      "type": "string",
+
+      "minLength": 1,
+
+      "maxLength": 80,
+
+      "metadata": {
+
+        "description": "Name of the Logic App."
+
+      }
+
+    },
+
+    "location": {
+
+      "type": "string",
+
+      "defaultValue": "[resourceGroup().location]",
+
+      "metadata": {
+
+        "description": "Location for all resources."
+
+      }
+
+    }
+
+  },
+
+  "variables": {},
+
+  "resources": [
+
+    {
+
+      "name": "[parameters('LogicAppName')]",
+
+      "type": "Microsoft.Logic/workflows",
+
+      "location": "[parameters('location')]",
+      "apiVersion": "2017-07-01",
+
+      "tags": {
+
+        "displayName": "LogicApp"
+
+      },
+
+      "properties": {
+
+        "state": "Enabled",
+
+        "definition": {
+          "$schema": "http://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "triggers": {
+            "Recurrence": {
+              "type": "Recurrence",
+              "recurrence": {
+                "frequency": "Minute",
+                "interval": 15
+              }
+            }
+          },
+          "actions": {
+            "HTTP": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "http://test_logicapp.com/alertprocess"
+              }
+            }
+          }
+        }
+
+      }
+    }
+  ]
+}
