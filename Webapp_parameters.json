@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "hostingPlanName": {
+      "value": "Webapp112_plan"
+    },
+    "webSiteName": {
+      "value": "Webaks1test"
+    },
+
+    "location": {
+      "value": "eastus"
+    },
+       "subscriptionId": {
+      "value": "0481ebf7-2bf5-4d97-b9e9-65faea2964fe"
+    },
+    "appInsightsName": {
+      "value": "Webapp1_insight"
+    }
+
+  }
+}
