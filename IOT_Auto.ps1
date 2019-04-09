@@ -41,7 +41,6 @@ az iot hub create --name $iotHubName --resource-group $resourceGroup --sku S1 --
 
 
 # Read the keys/connection string of storage
-#$storageAccountKey=(az storage account keys list --resource-group $resourceGroup --account-name $storageAccountName --query "[0].value" | tr -d '"')
 
 $storageConnectionString=(az storage account show-connection-string --name $storageAccountName --query connectionString -o tsv)
 
