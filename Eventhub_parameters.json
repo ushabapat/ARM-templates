@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "namespaceName": {
+      "value": "EventhubaksNS12"
+    },
+    "eventhubSku": {
+      "value": "Standard"
+    },
+    "eventHubName": {
+      "value": "hubakst11"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "isAutoInflateEnabled": {
+      "value": "False"
+    },
+    "messageRetentionInDays": {
+      "value": 5
+    },
+    "partitionCount": {
+      "value": 7
+    },
+    "eventhubAuthorizationRuleName": {
+      "value": "policy-16"
+    },
+    "eventhubAuthorizationRuleName1": {
+      "value": "policy-20"
+    },
+    "subscriptionId": {
+      "value": "0481ebf7-2bf5-4d97-b9e9-65faea2964fe"
+    },
+    "consumerGroupName": {
+      "value": "consumergrpAKS2"
+    }
+  }
+}
